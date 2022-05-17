@@ -29,12 +29,14 @@ loadButton.addEventListener('click', async() => {
 		templateStyle.innerHTML = `
 			.template div {
 				background-image: url(${linkInput.value});
+				background-size: 256px 128px;
 			}`
 		document.head.appendChild(templateStyle)
 	}
 	teeStyle.innerHTML = `
 		.tee div:not(.eyes), .eyes div {
 			background-image: url(${img});
+			background-size: 256px 128px;
 		}`
 	document.head.appendChild(teeStyle)
 	lastInput = linkInput.value
