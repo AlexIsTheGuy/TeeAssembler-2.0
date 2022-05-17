@@ -1,0 +1,180 @@
+/*
+
+	TeeAssembler 2.0
+
+	Made by: Aleksandar Blazic
+	
+*/
+
+html,body {
+    background-color: #191919;
+    color: white;
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    text-align: center;
+}
+
+body {
+	display: flex;
+	align-items: center;
+	justify-content: start;
+	flex-direction: column;
+	padding-top: 2rem
+}
+
+:focus {
+    outline: none;
+}
+
+.github-fork-ribbon:before {
+	background-color: #252525
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo .myTee {
+    width: 3rem;
+    height: 3rem;
+    background-image: url(../img/favicon-96x96.png);
+    background-size: cover;
+    margin-right: .5rem;
+}
+
+h1 {
+	font-weight: 700;
+    margin: 0;
+}
+
+.colorsWrap {
+	display: flex;
+	margin-bottom: 1rem;
+}
+
+.colorsWrap .bodyWrap,.colorsWrap .feetWrap {
+    display: flex;
+    vertical-align: top;
+	justify-content: center;
+	flex-direction: column;
+	margin: 0 1.5rem;
+}
+
+.colorsWrap p {
+	margin: 1rem 0 .5rem -.5rem;
+	text-align: left;
+}
+
+.container {
+	display: flex;
+	background-color: #252525;
+	justify-content: center;
+	align-items: center;
+	margin-top: 1rem;
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.bodyInput,.feetInput,.externalSkin {
+    display: flex;
+    width: 12rem;
+    height: 1.5rem;
+    background-color: #252525;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    border: none;
+    font-size: 1rem;
+    padding: 0;
+	border-radius: 2px;
+	padding: 0 .5rem;
+	transition: .25s;
+}
+
+.externalSkin {
+    width: 24rem;
+	border-radius: 0;
+}
+
+.divider {
+	width: 1px;
+	height: 1.25rem;
+	background-color: #202020
+}
+
+.externalSkinButton {
+    width: 3.5rem;
+    height: 1.5rem;
+	line-height: 1.5rem;
+    background-color: #252525;
+    font-size: 1rem;
+    cursor: pointer;
+	transition: .25s;
+}
+
+.result {
+    margin: .5rem 0 0 0;
+}
+
+.template {
+    width: 256px;
+    height: 128px;
+    margin: 1rem .5rem 0;
+    background-color: #252525;
+    background-image: linear-gradient(45deg, #202020 25%, transparent 25%), linear-gradient(-45deg, #202020 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #202020 75%), linear-gradient(-45deg, transparent 75%, #202020 75%);
+    background-size: 16px 16px;
+    background-position: 0px 0px, 0px 8px, 8px -8px, -8px 0px;
+	border-radius: 2px;
+}
+
+.template div {
+    width: 100%;
+    height: 100%;
+}
+
+/* Tee */
+.tee {
+    width: 4rem;
+    height: 4rem;
+    position: relative;
+    margin: 1rem .5rem;
+	background-color: #252525;
+    background-image: linear-gradient(45deg,#202020 25%,transparent 0,transparent 75%,#202020 0,#202020),linear-gradient(45deg,#202020 25%,transparent 0,transparent 75%,#202020 0,#202020);
+    background-size: 16px 16px;
+    background-position: 8px 8px,0 0,0 0,0 0;
+	border-radius: 2px;
+}
+
+.tee div {
+    position: absolute;
+}
+
+.button {
+	height: 1.5rem;
+	line-height: 1.5rem;
+	background-color: #252525;
+	border-radius: 2px;
+	font-size: .8rem;
+	padding: 0 .5rem;
+	cursor: pointer;
+	transition: .25s
+}
+
+.bodyInput:hover,.feetInput:hover,.externalSkin:hover,.externalSkinButton:hover,.button:hover {
+	background-color: rgba(255, 255, 255, .1);
+}
+
+@media screen and (max-width: 564px) {
+	.externalSkin {
+		width: calc(75% - 91px);
+	}
+}
+
+@media screen and (max-width: 370px) {
+	.externalSkin {
+		width: calc(100% - 91px);
+	}
+}
