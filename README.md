@@ -1,4 +1,4 @@
-# TW-SkinColorer
+# TeeAssembler 2.0
 
 ## Credits
 
@@ -13,6 +13,29 @@ The Demo website can be viewed at [teeassembler.developer.li](https://teeassembl
 
 ---
 ## Usage
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+
+		...
+
+		<link rel='stylesheet' href='css/Tee.css'>
+
+	</head>
+	<body>
+
+		...
+
+	</body>
+
+	<script src='js/color.js'></script>
+	<script src='js/TeeAssembler.js'></script>
+</html>
+```
+
+Add the styles in the `<head>` (optional) and the scripts after `<body>`.
 
 ### Initialization:
 
