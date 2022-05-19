@@ -137,6 +137,9 @@ myTee.lookAt(270) 	// Up
 ### Properties:
 
 ```js
+teeArray			// (Array) Array of loaded Tee classes
+teeIDsArray			// (Array) Array of random IDs from Tee classes
+
 myTee.container		// (HTMLElement) Container for tee render
 myTee.randomID		// (String) random ID of Tee
 
