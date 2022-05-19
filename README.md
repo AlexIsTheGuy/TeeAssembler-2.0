@@ -1,5 +1,19 @@
 # TeeAssembler 2.0
 
+TeeAssembler 2.0 is a script used for coloring a TeeWorlds skin image the same way TeeWorlds does and rendering the image in your browser using only CSS and JavaScript.
+
+## Contact
+
+You can contact me on Discord for anything related to the project: Alexander_#6686
+
+---
+## License
+
+Copyright (c) 2022 Aleksandar Blažić
+
+Licensed under the [MIT](https://github.com/AlexIsTheGuy/TeeAssembler-2.0/blob/main/LICENSE) license.
+
+---
 ## Credits
 
 Thanks to [b0th#6474](https://github.com/theobori) for helping me with the project.
@@ -137,17 +151,17 @@ myTee.lookAt(270) 	// Up
 ### Properties:
 
 ```js
-teeArray		// (Array) Array of loaded Tee classes
-teeIDsArray		// (Array) Array of random IDs from Tee classes
+teeArray			// (Array) Array of loaded Tee classes
+teeIDsArray			// (Array) Array of random IDs from Tee classes
 
 myTee.container		// (HTMLElement) Container for tee render
 myTee.randomID		// (String) random ID of Tee
 
 myTee.canvas		// (HTMLElement) Canvas element for (colored) tee image
-myTee.ctx		// (CanvasRenderingContext2D) Canvas context
+myTee.ctx			// (CanvasRenderingContext2D) Canvas context
 myTee.elements		// (Object) Tee body parts and their canvas elements
 
-myTee.image		// (HTMLElement) Image element of the original image
+myTee.image			// (HTMLElement) Image element of the original image
 myTee.imageLink		// (String) Original image URL
 myTee.imageResult	// (String) Base64 (colored) image 
 
@@ -162,3 +176,4 @@ myTee.eyesAngle		// (String) Angle of eyes from center of the tee in degrees
 ## Known issues
 
 - Eyes are not perfectly aligned like in the game but it's close enough.
+- TeeWorlds color codes only supported for rendering
