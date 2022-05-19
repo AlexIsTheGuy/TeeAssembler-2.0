@@ -157,7 +157,8 @@ const codeFormat = (color) => {
 	color = genChunks(color, 2).map(x => parseInt(x, 16))
 	color[0] = (color[0] * 360) / 255
 	color[1] = (color[1] * 100) / 255
-	color[2] = ((color[2] / 2 + 128) * 100) / 255
+	//color[2] = ((color[2] / 2 + 128) * 100) / 255 - Original code
+	color[2] = (((color[2] / 255) / 2) + 0.5) * 100
 	return color
 }
 
