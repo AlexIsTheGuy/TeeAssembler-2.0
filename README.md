@@ -137,17 +137,17 @@ myTee.lookAt(270) 	// Up
 ### Properties:
 
 ```js
-teeArray			// (Array) Array of loaded Tee classes
-teeIDsArray			// (Array) Array of random IDs from Tee classes
+teeArray		// (Array) Array of loaded Tee classes
+teeIDsArray		// (Array) Array of random IDs from Tee classes
 
 myTee.container		// (HTMLElement) Container for tee render
 myTee.randomID		// (String) random ID of Tee
 
 myTee.canvas		// (HTMLElement) Canvas element for (colored) tee image
-myTee.ctx			// (CanvasRenderingContext2D) Canvas context
+myTee.ctx		// (CanvasRenderingContext2D) Canvas context
 myTee.elements		// (Object) Tee body parts and their canvas elements
 
-myTee.image			// (HTMLElement) Image element of the original image
+myTee.image		// (HTMLElement) Image element of the original image
 myTee.imageLink		// (String) Original image URL
 myTee.imageResult	// (String) Base64 (colored) image 
 
