@@ -8,7 +8,7 @@
 
 html,body {
     background-color: #191919;
-    color: white;
+    color: #fff;
     margin: 0;
     font-family: 'DM Sans', sans-serif;
     font-weight: 400;
@@ -24,12 +24,69 @@ body {
 	padding-top: 2rem
 }
 
+* {
+	box-sizing: border-box;
+}
+
 :focus {
     outline: none;
 }
 
 .github-fork-ribbon:before {
 	background-color: #252525
+}
+
+.checkboxWrapper {
+	text-align: left;
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+input[type="checkbox"] {
+	opacity: 0;
+	position: absolute;
+	margin: 0;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+}
+
+input[type="checkbox"] + .checkboxPlaceholder {
+	display: inline-block;
+	white-space: nowrap;
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	margin-right: 8px;
+	vertical-align: middle;
+	cursor: pointer;
+	border: 2px solid white;
+	border-radius: 2px;
+	position: relative;
+	pointer-events: none;
+}
+
+input[type="checkbox"]:checked + .checkboxPlaceholder {
+	background-color: white;
+}
+
+input[type="checkbox"]:checked + .checkboxPlaceholder::before {
+	content: '';
+	position: absolute;
+	bottom: 3px;
+	left: 3px;
+	width: 7.5px;
+	height: 12px;
+	border-style: solid;
+	border-top: none;
+	border-left: none;
+	border-right-width: calc(2/15 * 20px);
+	border-bottom-width: calc(2/15 * 20px);
+	border-color: #151515;
+	box-sizing: content-box;
+	transform: rotate(45deg);
 }
 
 .logo {
@@ -50,22 +107,38 @@ h1 {
     margin: 0;
 }
 
-.colorsWrap {
+.optionsWrap {
 	display: flex;
+	width: 100%;
+	justify-content: center;align-items: start;
+	padding: 0 1rem;
+	user-select: none;
+	transition: opacity .15s;
+}
+
+.optionsWrap:first-child {
 	margin-bottom: 1rem;
 }
 
-.colorsWrap .bodyWrap,.colorsWrap .feetWrap {
+.optionsWrap[disabled] {
+	opacity: .5;
+	pointer-events: none;
+}
+
+.optionsWrap > div {
     display: flex;
     vertical-align: top;
 	justify-content: center;
 	flex-direction: column;
-	margin: 0 1.5rem;
+	margin: 0 .5rem;min-width: calc(33% - 1rem);width: calc(33% - 1rem);
 }
 
-.colorsWrap p {
-	margin: 1rem 0 .5rem -.5rem;
+.optionsWrap p:not(.result) {
 	text-align: left;
+}
+
+.optionsWrap p:not(.result) + * {
+	margin-left: 1rem;
 }
 
 .container {
@@ -76,22 +149,32 @@ h1 {
 	margin-top: 1rem;
 	border-radius: 2px;
 	overflow: hidden;
+	user-select: none;
 }
 
-.bodyInput,.feetInput,.externalSkin {
+.externalSkin, .bodyInput, .feetInput, .angleInput, .currentAngle, .coloringModeInput {
     display: flex;
-    width: 12rem;
     height: 1.5rem;
+	line-height: 1.5rem;
     background-color: #252525;
-    color: white;
+    color: #fff;
     font-family: 'DM Sans', sans-serif;
     font-weight: 400;
     border: none;
     font-size: 1rem;
-    padding: 0;
 	border-radius: 2px;
 	padding: 0 .5rem;
 	transition: .25s;
+	appearance: none;
+}
+
+.bodyInput, .feetInput, .coloringModeInput, .checkboxWrapper, .angleInput, .currentAngle {
+	height: 1.5rem;
+	width: auto;
+}
+
+.currentAngle {
+	color: #999
 }
 
 .externalSkin {
@@ -116,7 +199,12 @@ h1 {
 }
 
 .result {
-    margin: .5rem 0 0 0;
+	text-align: left;
+    margin: 0;
+}
+
+label {
+	cursor: pointer;
 }
 
 .template {
@@ -167,14 +255,44 @@ h1 {
 	background-color: rgba(255, 255, 255, .1);
 }
 
-@media screen and (max-width: 564px) {
+@media screen and (max-width: 800px) {
+	.container {
+		width: 90%;
+	}
 	.externalSkin {
-		width: calc(75% - 91px);
+		width: 100%;
+	}
+	.optionsWrap {
+		flex-direction: column;
+	}
+	.optionsWrap > div {
+		min-width: 70%;
+		width: 70%;
+		margin: 0 auto;
 	}
 }
 
-@media screen and (max-width: 370px) {
-	.externalSkin {
-		width: calc(100% - 91px);
+@media screen and (max-width: 500px) {
+	.logo h1 {
+		font-size: 1.75rem;
+	}
+}
+
+@media screen and (max-width: 450px) {
+	.logo h1 {
+		font-size: 1.5rem;
+	}
+	.optionsWrap {
+		padding: 0 .5rem
+	}
+	.optionsWrap > div {
+		min-width: 100%;
+		width: 100%;
+	}
+}
+
+@media screen and (max-width: 400px) {
+	.logo h1 {
+		font-size: 1rem;
 	}
 }

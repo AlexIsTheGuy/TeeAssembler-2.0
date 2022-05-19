@@ -1,15 +1,11 @@
 /*
 
-	TeeAssembler
+	TeeAssembler 2.0
 
-	Made by Alexander Bl.
-	Discord: Alexander_#6686 (just in case you want to contact me)
+	Made by Alexander Blazic
+	Discord: Alexander_#6686
 	
 */
-
-.teeContainer {
-	position: relative;
-}
 
 .back_foot,.back_foot_shadow,.front_foot,.front_foot_shadow {
     width: 64px;
@@ -86,34 +82,17 @@
 .tee .line {
     width: 9.5px;
     height: 1px;
-    background: red;
     position: absolute;
     top: 50%;
     left: 50%;
     transform-origin: 0.5px 0.5px;
 	opacity: 0;
-	z-index: 1;
 }
 
 .tee .marker {
     width: 1px;
     height: 1px;
-    background: lime;
     position: absolute;
     right: -1px;
     opacity: 0;
-}
-
-.tee::after {
-    display: block;
-    width: 4rem;
-    height: 4rem;
-    position: absolute;
-    left: 4rem;
-    background-image: url(https://ratelimited.me/nS2A0JlPZ8Jy.png);
-	background-image: url(https://ratelimited.me/06SgwbRoPmxp.png);
-	background-image: url(https://ratelimited.me/hdOWPosgLWtM.png);
-	background-image: url(https://ratelimited.me/0DhuPhSIYfBe.png);
-    background-size: 160%;
-    background-position: -24px -38px;
 }
