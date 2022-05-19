@@ -162,4 +162,3 @@ myTee.eyesAngle		// (String) Angle of eyes from center of the tee in degrees
 ## Known issues
 
 - Eyes are not perfectly aligned like in the game but it's close enough.
-- TeeWorlds color codes only supported for rendering
