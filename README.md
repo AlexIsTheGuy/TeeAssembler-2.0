@@ -151,8 +151,8 @@ myTee.lookAt(270) 	// Up
 ### Properties:
 
 ```js
-teeArray			// (Array) Array of loaded Tee classes
-teeIDsArray			// (Array) Array of random IDs from Tee classes
+teeArray		// (Array) Array of loaded Tee classes
+teeIDsArray		// (Array) Array of random IDs from Tee classes
 
 myTee.container		// (HTMLElement) Container for tee render
 myTee.randomID		// (String) random ID of Tee
@@ -176,4 +176,3 @@ myTee.eyesAngle		// (String) Angle of eyes from center of the tee in degrees
 ## Known issues
 
 - Eyes are not perfectly aligned like in the game but it's close enough.
-- TeeWorlds color codes only supported for rendering
