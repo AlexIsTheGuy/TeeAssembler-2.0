@@ -11,6 +11,10 @@
 	font-size: 1px;
 }
 
+.tee [body-part] {
+    position: absolute;
+}
+
 .back_foot,.back_foot_shadow,.front_foot,.front_foot_shadow {
 	width: 64em;
 	height: 32em;
@@ -59,12 +63,8 @@
 	transform: scale(1.35);
 }
 
-.eyes div {
-	display: inline-flex;
-	position: absolute;
-}
-
 .lEye,.rEye {
+	display: inline-flex;
 	width: 32em;
 	height: 32em;
 	background-position: -64em -96em;
