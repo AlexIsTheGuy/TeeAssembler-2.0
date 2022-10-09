@@ -30,6 +30,57 @@ const genRandomID = (len=16) => {
     return randomString
 }
 
+const setContainer = (_this, container) => {
+	if (container instanceof HTMLElement) {
+		_this.container = container
+		_this.container.id = _this.randomID
+
+		_this.container.innerHTML = `
+			<div class='line'>
+				<div class='marker'></div>
+			</div>
+
+			<div class='body_shadow' body-part></div>
+
+			<div class='back_foot_shadow' body-part></div>
+			<div class='back_foot' body-part></div>
+
+			<div class='body' body-part></div>
+
+			<div class='eyes'>
+				<div class='lEye' body-part></div>
+				<div class='rEye' body-part></div>
+			</div>
+
+			<div class='front_foot_shadow' body-part></div>
+			<div class='front_foot' body-part></div>`
+
+		;(async () => {
+			let style = document.createElement('style')
+			if (_this.container.getAttribute('data-bodycolor') !== null && _this.container.getAttribute('data-feetcolor') !== null) {
+				await _this.getTeeImage(_this.container.getAttribute('data-bodycolor'), _this.container.getAttribute('data-feetcolor'), _this.container.getAttribute('data-coloringmode'))
+			}
+			else {
+				await _this.getTeeImage()
+			}
+			style.innerHTML = `
+				#${_this.randomID}.tee div[body-part] {
+					background-image: url(${_this.imageResult});
+					background-size: 256em 128em;
+				}`
+			let tempStyle = document.querySelector(`#${_this.randomID}.tee style`)
+			if (tempStyle) {
+				tempStyle.remove()
+			}
+			_this.container.appendChild(style)
+		})()
+		_this.lookAt(_this.eyesAngle)
+	}
+	else {
+		throw Error(`Invalid element: container is not of type HTMLElement`)
+	}
+}
+
 const teeArray = [],
 teeIDsArray = []
 
@@ -37,7 +88,7 @@ class Tee {
 	constructor(imageLink, container) {
 		teeArray.push(this)
 		this.canvas = document.createElement('canvas')
-		this.ctx = this.canvas.getContext('2d')
+		this.ctx = this.canvas.getContext('2d', {willReadFrequently: true})
 		this.elements = new Object()
 		this.image = new Image()
 		this.image.crossOrigin = ''
@@ -58,54 +109,7 @@ class Tee {
 		getID()
 		teeIDsArray.push(this.randomID)
 		if (container) {
-			if (container instanceof HTMLElement) {
-				this.container = container
-				this.container.id = this.randomID;
-
-				this.container.innerHTML = `
-				<div class='line'>
-					<div class='marker'></div>
-				</div>
-
-				<div class='body_shadow' body-part></div>
-
-				<div class='back_foot_shadow' body-part></div>
-				<div class='back_foot' body-part></div>
-
-				<div class='body' body-part></div>
-
-				<div class='eyes'>
-					<div class='lEye' body-part></div>
-					<div class='rEye' body-part></div>
-				</div>
-
-				<div class='front_foot_shadow' body-part></div>
-				<div class='front_foot' body-part></div>`
-
-				;(async () => {
-					let style = document.createElement('style')
-					if (this.container.getAttribute('data-bodycolor') !== null && this.container.getAttribute('data-feetcolor') !== null) {
-						await this.getTeeImage(this.container.getAttribute('data-bodycolor'), this.container.getAttribute('data-feetcolor'), this.container.getAttribute('data-coloringmode'))
-					}
-					else {
-						await this.getTeeImage()
-					}
-					style.innerHTML = `
-						#${this.randomID}.tee div[body-part] {
-							background-image: url(${this.imageResult});
-							background-size: 256em 128em;
-						}`
-					let tempStyle = document.querySelector(`#${this.randomID}.tee style`)
-					if (tempStyle) {
-						tempStyle.remove()
-					}
-					this.container.appendChild(style)
-				})()
-				this.lookAt(this.eyesAngle)
-			}
-			else {
-				throw Error(`Invalid element: container is not of type HTMLElement`)
-			}
+			setContainer(this, container)
 		}
 	}
 	async loadImage(imageLink) {
@@ -264,7 +268,9 @@ class Tee {
 				tempCanvas.width = this.d[2]
 				tempCanvas.height = this.d[3]
 
-				this.currentCtx = tempCanvas.getContext('2d')
+				this.currentCtx = tempCanvas.getContext('2d', {
+					willReadFrequently: true
+				})
 
 				this.currentCtx.putImageData(this.ctx.getImageData(this.d[0],this.d[1],this.d[2],this.d[3]),0,0)
 				if (body_parts[part] === 'body') {
@@ -305,54 +311,7 @@ class Tee {
 		}
 	}
 	bindContainer(container) {
-		if (container instanceof HTMLElement) {
-			this.container = container
-			this.container.id = this.randomID
-
-			this.container.innerHTML = `
-			<div class='line'>
-				<div class='marker'></div>
-			</div>
-
-			<div class='body_shadow' body-part></div>
-
-			<div class='back_foot_shadow' body-part></div>
-			<div class='back_foot' body-part></div>
-
-			<div class='body' body-part></div>
-
-			<div class='eyes'>
-				<div class='lEye' body-part></div>
-				<div class='rEye' body-part></div>
-			</div>
-
-			<div class='front_foot_shadow' body-part></div>
-			<div class='front_foot' body-part></div>`
-
-			;(async () => {
-				let style = document.createElement('style')
-				if (this.container.getAttribute('data-bodycolor') !== null && this.container.getAttribute('data-feetcolor') !== null) {
-					await this.getTeeImage(this.container.getAttribute('data-bodycolor'), this.container.getAttribute('data-feetcolor'), this.container.getAttribute('data-coloringmode'))
-				}
-				else {
-					await this.getTeeImage()
-				}
-				style.innerHTML = `
-					#${this.randomID}.tee div[body-part] {
-						background-image: url(${this.imageResult});
-						background-size: 256em 128em;
-					}`
-				let tempStyle = document.querySelector(`#${this.randomID}.tee style`)
-				if (tempStyle) {
-					tempStyle.remove()
-				}
-				this.container.appendChild(style)
-			})()
-			this.lookAt(this.eyesAngle)
-		}
-		else {
-			throw Error(`Invalid element: container is not of type HTMLElement`)
-		}
+		setContainer(this, container)
 	}
 	unbindContainer() {
 		this.container.removeAttribute('id')
