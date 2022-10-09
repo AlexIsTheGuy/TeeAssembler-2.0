@@ -364,7 +364,7 @@ class Tee {
 			y: this.marker.getBoundingClientRect().y
 		}
 		this.scale = this.container.getBoundingClientRect().width / this.container.offsetWidth
-		this.teeEyes.style.transform = `translate(${(this.markerCoord.x - this.container.getBoundingClientRect().x) / this.scale}em, ${(this.markerCoord.y - this.container.getBoundingClientRect().y) / this.scale}em)`
+		this.teeEyes.style.transform = `translate(${(this.markerCoord.x - this.container.getBoundingClientRect().x) / this.scale}px, ${(this.markerCoord.y - this.container.getBoundingClientRect().y) / this.scale}px)`
 	}
 	setTeeEyesVariables() {
 		this.teeEyesVariables = true
