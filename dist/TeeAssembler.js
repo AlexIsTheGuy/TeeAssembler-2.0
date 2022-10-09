@@ -364,7 +364,7 @@ class Tee {
 			y: this.marker.getBoundingClientRect().y
 		}
 		this.scale = this.container.getBoundingClientRect().width / this.container.offsetWidth
-		this.teeEyes.style.transform = `translate(${(this.markerCoord.x - this.container.getBoundingClientRect().x) / this.scale}px, ${(this.markerCoord.y - this.container.getBoundingClientRect().y) / this.scale}px)`
+		this.teeEyes.style.transform = `translate(${(this.markerCoord.x - this.container.getBoundingClientRect().x) / this.scale}em, ${(this.markerCoord.y - this.container.getBoundingClientRect().y) / this.scale}em)`
 	}
 	setTeeEyesVariables() {
 		this.teeEyesVariables = true
@@ -382,7 +382,7 @@ class Tee {
 
 		this.moveTeeEyesFunction = (e) => {
 			this.eyesAngle = Math.atan2(e.clientY - originCoord.y, e.clientX - originCoord.x) * 180 / Math.PI
-			this.line.style.transform = `translate(-1px, .5px) rotate(${this.eyesAngle}deg)`
+			this.line.style.transform = `translate(-1em, .5em) rotate(${this.eyesAngle}deg)`
 			this.teeEyesTranslateFunction()
 		}
 
@@ -394,7 +394,7 @@ class Tee {
 	lookAt(deg=0) {
 		this.eyesAngle = deg
 		this.setTeeEyesVariables()
-		this.line.style.transform = `translate(-1px, .5px) rotate(${deg}deg)`
+		this.line.style.transform = `translate(-1em, .5em) rotate(${deg}deg)`
 
 		this.teeEyesTranslateFunction()
 	}
