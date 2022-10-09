@@ -93,7 +93,7 @@ class Tee {
 					style.innerHTML = `
 						#${this.randomID}.tee div[body-part] {
 							background-image: url(${this.imageResult});
-							background-size: 256px 128px;
+							background-size: 256em 128em;
 						}`
 					let tempStyle = document.querySelector(`#${this.randomID}.tee style`)
 					if (tempStyle) {
@@ -340,7 +340,7 @@ class Tee {
 				style.innerHTML = `
 					#${this.randomID}.tee div[body-part] {
 						background-image: url(${this.imageResult});
-						background-size: 256px 128px;
+						background-size: 256em 128em;
 					}`
 				let tempStyle = document.querySelector(`#${this.randomID}.tee style`)
 				if (tempStyle) {
