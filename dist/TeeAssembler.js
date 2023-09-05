@@ -165,7 +165,6 @@ class Tee {
 		byte
 
 		const newWeight = 192,
-		invOrgWeight = 255 - orgWeight,
 		invNewWeight = 255 - newWeight
 
 		// Find the most common frequence
@@ -178,6 +177,8 @@ class Tee {
 			if (frequencies[orgWeight] < frequencies[i]) {
 				orgWeight = i
 			}
+			
+		const invOrgWeight = 255 - orgWeight
 
 		for (byte=0;byte<buffer.length;byte+=4) {
 			let value = buffer[byte]
