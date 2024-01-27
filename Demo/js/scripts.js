@@ -13,7 +13,7 @@ loadButton = document.querySelector('.externalSkinButton'),
 template = document.querySelector('.template'),
 bodyColorInput = document.querySelector('.bodyInput'),
 feetColorInput = document.querySelector('.feetInput'),
-coloringModeInput = document.querySelector('.coloringModeInput'),
+colorFormatInput = document.querySelector('.colorFormatInput'),
 angleInput = document.querySelector('.angleInput'),
 currentAngle = document.querySelector('.currentAngle'),
 lookAtCursorCheckbox = document.querySelector('#cursorLook'),
@@ -56,22 +56,19 @@ const hslToHex = (h,s,l) => {
 let rgbB,hslB,rgbF,hslF
 
 loadButton?.addEventListener('click', () => {
+	lookAtCursorCheckbox.checked = false
 	document.querySelectorAll('.optionsWrap')[1].removeAttribute('disabled')
 	let teeContainer = document.querySelector('.teeassembler-tee')
-	if (bodyColorInput.value !== '' || feetColorInput.value !== '') {
-		teeContainer.setAttribute('data-teeassembler-color_body', bodyColorInput.value)
-		teeContainer.setAttribute('data-teeassembler-color_feet', feetColorInput.value)
-		teeContainer.setAttribute('data-teeassembler-color_mode', coloringModeInput.value)
-	
+	if (bodyColorInput.value !== '' || feetColorInput.value !== '') {	
 		rgbB,hslB,rgbF,hslF
-		if (coloringModeInput.value === 'code') {
+		if (colorFormatInput.value === 'code') {
 			hslB = codeFormat(bodyColorInput.value)
 			rgbB = HSLToRGB(Math.round(hslB[0]),Math.round(hslB[1]),Math.round(hslB[2]))
 
 			hslF = codeFormat(feetColorInput.value)
 			rgbF = HSLToRGB(Math.round(hslF[0]),Math.round(hslF[1]),Math.round(hslF[2]))
 		}
-		else if (coloringModeInput.value === 'rgb') {
+		else if (colorFormatInput.value === 'rgb') {
 			hslB = RGBToHSL(bodyColorInput.value.split(',')[0],bodyColorInput.value.split(',')[1],bodyColorInput.value.split(',')[2])
 			rgbB = bodyColorInput.value.split(',')
 
@@ -107,11 +104,20 @@ loadButton?.addEventListener('click', () => {
 		document.querySelector('.bodyWrap .result').innerHTML = ''
 		document.querySelector('.feetWrap .result').innerHTML = ''
 	}
-	myTee = new TeeAssembler.Tee(linkInput.value)
-	myTee.api.functions.bindContainer(teeContainer)
+	if (myTee) {
+		myTee.api.functions.unbindContainer()
+	}
+	
+	myTee = new TeeAssembler.Tee({
+		container: teeContainer,
+		imageLink: linkInput.value,
+		bodyColor: bodyColorInput.value,
+		feetColor: feetColorInput.value,
+		colorFormat: colorFormatInput.value
+	})
 	currentAngle.value = `~${Math.round(myTee.eyesAngle)}deg`
 	if (lastInput !== linkInput.value) {
-		templateStyle.innerHTML = `
+		templateStyle.textContent = `
 			.template div {
 				background-image: url(${linkInput.value});
 				background-size: 256px 128px;
