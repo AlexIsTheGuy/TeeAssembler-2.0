@@ -1,364 +1,474 @@
-const SKIN = {
-	'size': {
-		'width': 256,
-		'height': 128
+/*
+
+	TeeAssembler 2.0
+	https://github.com/AlexIsTheGuy/TeeAssembler-2.0
+	
+	Copyright (c) 2022–2024 Aleksandar Blažić and contributors
+	Released under the MIT license
+	https://github.com/AlexIsTheGuy/TeeAssembler-2.0/blob/main/LICENSE
+
+*/
+
+const TeeAssembler = {
+	randomID: (length = 16) => {
+		const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+		let randomString = ''
+
+		for (let i = 0; i < length; i++) {
+			const randomPos = Math.floor(Math.random() * charSet.length)
+			randomString += charSet.substring(randomPos, randomPos+1)
+		}
+
+		return randomString
 	},
-	'elements': {
-		'body': [0, 0, 96, 96],
-		'body_shadow': [96, 0, 96, 96],
-		'hand': [192, 0, 32, 32],
-		'hand_shadow': [224, 0, 32, 32],
-		'foot': [192, 32, 64, 32],
-		'foot_shadow': [192, 64, 64, 32],
-		'credits': [0, 96, 64, 32],
-		'default_eye': [64, 96, 32, 32],
-		'angry_eye': [96, 96, 32, 32],
-		'blink_eye': [128, 96, 32, 32],
-		'happy_eye': [160, 96, 32, 32],
-		'cross_eye': [192, 96, 32, 32],
-		'surprised_eye': [224, 96, 32, 32]
+	skin: {
+		size: {
+			width: 256,
+			height: 128
+		},
+		elements: {
+			body: [0, 0, 96, 96],
+			body_shadow: [96, 0, 96, 96],
+			hand: [192, 0, 32, 32],
+			hand_shadow: [224, 0, 32, 32],
+			foot: [192, 32, 64, 32],
+			foot_shadow: [192, 64, 64, 32],
+			credits: [0, 96, 64, 32],
+			default_eye: [64, 96, 32, 32],
+			angry_eye: [96, 96, 32, 32],
+			blink_eye: [128, 96, 32, 32],
+			happy_eye: [160, 96, 32, 32],
+			cross_eye: [192, 96, 32, 32],
+			surprised_eye: [224, 96, 32, 32]
+		}
+	},
+	array: {
+		tees: [],
+		teeIDs: []
 	}
 }
 
-const genRandomID = (len=16) => {
-    charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    let randomString = ''
-    for (let i=0;i<len;i++) {
-        let randomPos = Math.floor(Math.random() * charSet.length)
-        randomString += charSet.substring(randomPos,randomPos+1)
-    }
-    return randomString
-}
+{
+	class Tee {
+		constructor(args={}) {
+			TeeAssembler.array.tees.push(this)
 
-const setContainer = (_this, container) => {
-	if (container instanceof HTMLElement) {
-		_this.container = container
-		_this.container.id = _this.randomID
+			args.imageLink = args.imageLink || 'https://ddnet.org/skins/skin/default.png'
 
-		_this.container.innerHTML = `
-			<div class='line'>
-				<div class='marker'></div>
-			</div>
-
-			<div class='body_shadow' body-part></div>
-
-			<div class='back_foot_shadow' body-part></div>
-			<div class='back_foot' body-part></div>
-
-			<div class='body' body-part></div>
-
-			<div class='eyes'>
-				<div class='lEye' body-part></div>
-				<div class='rEye' body-part></div>
-			</div>
-
-			<div class='front_foot_shadow' body-part></div>
-			<div class='front_foot' body-part></div>`
-
-		;(async () => {
-			let style = document.createElement('style')
-			if (_this.container.getAttribute('data-bodycolor') !== null && _this.container.getAttribute('data-feetcolor') !== null) {
-				await _this.getTeeImage(_this.container.getAttribute('data-bodycolor'), _this.container.getAttribute('data-feetcolor'), _this.container.getAttribute('data-coloringmode'))
+			this.api = {
+				functions: {...this.functions},
+				teeEyesVariables: false,
+				image: {
+					element: new Image(),
+					loaded: false,
+				}
 			}
-			else {
-				await _this.getTeeImage()
-			}
-			style.innerHTML = `
-				#${_this.randomID}.tee div[body-part] {
-					background-image: url(${_this.imageResult});
-					background-size: 256em 128em;
-				}`
-			let tempStyle = document.querySelector(`#${_this.randomID}.tee style`)
-			if (tempStyle) {
-				tempStyle.remove()
-			}
-			_this.container.appendChild(style)
-		})()
-		_this.lookAt(_this.eyesAngle)
-	}
-	else {
-		throw Error(`Invalid element: container is not of type HTMLElement`)
-	}
-}
 
-const teeArray = [],
-teeIDsArray = []
+			delete this.functions
 
-class Tee {
-	constructor(imageLink, container) {
-		teeArray.push(this)
-		this.canvas = document.createElement('canvas')
-		this.ctx = this.canvas.getContext('2d', {willReadFrequently: true})
-		this.elements = new Object()
-		this.image = new Image()
-		this.image.crossOrigin = ''
-		this.imageLink = imageLink
-		this.teeEyesVariables = false
-		this.eyesAngle = 0
+			this.api.image.element.crossOrigin = ''
+			this.api.image.link = args.imageLink
+			this.eyesAngle = 0
 
-		let getID = () => {
-			let tempID = genRandomID()
-			if (teeIDsArray.includes(tempID)) {
-				getID()
+			this.bodyColor = args.bodyColor || undefined,
+			this.feetColor = args.feetColor || undefined,
+			this.colorFormat = args.colorFormat || undefined
+
+			let ID = args.ID || TeeAssembler.randomID()
+
+			while(TeeAssembler.array.teeIDs.includes(ID) || document.getElementById(ID)) {
+				ID = TeeAssembler.randomID()
 			}
-			else {
-				this.randomID = tempID
+
+			this.ID = ID
+
+			TeeAssembler.array.teeIDs.push(this.ID)
+
+			this.api.functions.setContainer = async (container) => {
+				if (!container instanceof HTMLElement) {
+					throw Error(`Invalid element: container is not of type HTMLElement`)
+				}
+
+				this.container = container
+				this.container.dataset.teeassemblerId = this.ID
+
+				const fragment = document.createDocumentFragment()
+
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-eyes_guide_line', false)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-eyes_guide_marker', false, '.teeassembler-eyes_guide_line')
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-body_shadow', true)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-back_foot_shadow', true)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-back_foot', true)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-body', true)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-eyes', false)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-left_eye', true, '.teeassembler-eyes')
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-right_eye', true, '.teeassembler-eyes')
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-front_foot_shadow', true)
+				this.api.functions.createAndAppendTeeElements(fragment, 'teeassembler-front_foot', true)
+
+				this.container.appendChild(fragment)
+
+				const stylesheet = document.createElement('style')
+
+				if (!this.api.image.url) {
+					if (this.container.getAttribute('data-teeassembler-color_body') && this.container.getAttribute('data-teeassembler-color_feet')) {
+						await this.api.functions.getTeeImage(this.container.getAttribute('data-teeassembler-color_body'), this.container.getAttribute('data-teeassembler-color_feet'), this.container.getAttribute('data-teeassembler-color_format') || 'code')
+					}
+					else if (this.bodyColor && this.feetColor) {
+						await this.api.functions.getTeeImage(this.bodyColor, this.feetColor, this.colorFormat)
+					}
+					else {
+						await this.api.functions.getTeeImage()
+					}
+				}
+
+				stylesheet.textContent = `
+					.teeassembler-tee[data-teeassembler-id='${this.ID}'] div[data-teeassembler-body_part] {
+						background-image: url(${this.api.image.url});
+						background-size: 256em 128em;
+					}`
+
+				const previousStylesheet = document.querySelectorAll(`.teeassembler-tee[data-teeassembler-id='${this.ID}'] style`)
+
+				if (previousStylesheet) {
+					previousStylesheet.forEach(stylesheet => {
+						stylesheet.remove()
+					})
+				}
+
+				this.container.appendChild(stylesheet)
+
+				this.api.functions.lookAt(this.eyesAngle)
+			}
+
+			if (args.container) {
+				this.api.functions.setContainer(args.container)
 			}
 		}
+		functions = {
+			loadImage: async (imageLink) => {
+				this.api.image.element.src = imageLink
 
-		getID()
-		teeIDsArray.push(this.randomID)
-		if (container) {
-			setContainer(this, container)
-		}
-	}
-	async loadImage(imageLink) {
-		this.image.src = imageLink
-		await this.image.decode()
-		this.canvas.width = this.image.width
-		this.canvas.height = this.image.height
-		this.canvas.style.width = '256px'
-		this.canvas.style.height = '128px'
-		this.ctx.drawImage(this.image,0,0,this.canvas.width,this.canvas.height)
-	}
-	isRatioLegal = () => {
-		const ratio = SKIN.size.width / SKIN.size.height
-		return this.image.width / this.image.height === ratio
-	}
-	getMultiplier = () => {
-		return this.image.width / SKIN.size.width
-	}
-	setColor(color, mode) {
-		let buffer = this.currentImgData.data,
-		r, g, b, a, byte
+				await this.api.image.element.decode()
 
-		// Apply color on every pixel of the img
-		for (byte=0;byte<buffer.length;byte+=4) {
-			// Get pixel
-			r = buffer[byte]
-			g = buffer[byte + 1]
-			b = buffer[byte + 2]
-			a = buffer[byte + 3]
+				this.api.canvas = 'OffscreenCanvas' in window ? new OffscreenCanvas(0, 0) : document.createElement('canvas')
+				this.api.canvas.width = this.api.image.element.width
+				this.api.canvas.height = this.api.image.element.height
 
-			// Overwriting the pixel
-			let pixel = new Color(r, g, b, a)
-			COLOR_MODE[mode](pixel, color)
+				this.api.ctx = this.api.canvas.getContext('2d', {willReadFrequently: true})
+				
+				this.api.ctx.drawImage(this.api.image.element, 0, 0, this.api.canvas.width, this.api.canvas.height)
 
-			// Replace the pixel in the buffer
-			buffer[byte] = pixel.r
-			buffer[byte + 1] = pixel.g
-			buffer[byte + 2] = pixel.b
-			buffer[byte + 3] = pixel.a
-		}
-		this.someImgData = buffer
+				this.api.image.loaded = true
+			},
+			setColor: async (canvasContext, imageData, color, colorFormat) => {
+				const
+				buffer = imageData.data,
+				pixel = new Color(0, 0, 0, 0)
 
-		this.setCanvas()
-	}
-	reorderBody() {
-		// For the tee body
-		// Reorder that the average grey is 192,192,192
-		// https://github.com/ddnet/ddnet/blob/master/src/game/client/components/skins.cpp#L227-L263
+				// Apply color on every pixel of the image
+				for (let byte = 0; byte < buffer.length; byte += 4) {
+					// Get pixel and overwrite it
+					pixel.r = buffer[byte]
+					pixel.g = buffer[byte + 1]
+					pixel.b = buffer[byte + 2]
+					pixel.a = buffer[byte + 3]
 
-		let frequencies = Array(256).fill(0),
-		orgWeight = 0,
-		buffer = this.currentImgData.data,
-		byte
+					COLOR_MODE[colorFormat](pixel, color)
 
-		const newWeight = 192,
-		invOrgWeight = 255 - orgWeight,
-		invNewWeight = 255 - newWeight
+					// Replace the pixel in the buffer
+					buffer[byte] = pixel.r
+					buffer[byte + 1] = pixel.g
+					buffer[byte + 2] = pixel.b
+					buffer[byte + 3] = pixel.a
+				}
 
-		// Find the most common frequence
-		for (byte=0;byte<buffer.length;byte+=4)
-			if (buffer[byte + 3] > 128) {
-				frequencies[buffer[byte]]++
-			}
+				this.api.functions.setCanvas(canvasContext, buffer)
+			},
+			reorderBody: async (canvasContext, imageData) => {
+				//	For the tee body
+				//	Reorder that the average grey is 192,192,192
+				//	https://github.com/ddnet/ddnet/blob/master/src/game/client/components/skins.cpp#L227-L263
+				
+				
+				const
+				buffer = imageData.data,
+				frequencies = Array(256).fill(0),
+				newWeight = 192,
+				invNewWeight = 255 - newWeight
 
-		for (let i=1;i<256;i++)
-			if (frequencies[orgWeight] < frequencies[i]) {
-				orgWeight = i
-			}
+				let
+				orgWeight = 0,
+				byte
 
-		for (byte=0;byte<buffer.length;byte+=4) {
-			let value = buffer[byte]
+				// Find the most common frequence
+				for (byte = 0; byte < buffer.length; byte += 4) {
+					if (buffer[byte + 3] > 128) {
+						frequencies[buffer[byte]]++
+					}
+				}
 
-			if (value <= orgWeight && orgWeight == 0) {
-				continue
-			}
-			else if (value <= orgWeight) {
-				value = Math.trunc(((value / orgWeight) * newWeight))
-			}
-			else if (invOrgWeight == 0) {
-				value = newWeight
-			}
-			else {
-				value = Math.trunc((((value - orgWeight) / 
-				invOrgWeight) * invNewWeight + newWeight))
-			}
+				for (let i = 1; i < 256; i++) {
+					if (frequencies[orgWeight] < frequencies[i]) {
+						orgWeight = i
+					}
+				}
+				
+				const invOrgWeight = 255 - orgWeight
 
-			buffer[byte] = value
-			buffer[byte + 1] = value
-			buffer[byte + 2] = value
+				for (byte = 0; byte < buffer.length; byte += 4) {
+					let value = buffer[byte]
 
-		}
-		this.someImgData = buffer
+					if (value <= orgWeight && orgWeight == 0) {
+						continue
+					}
+					else if (value <= orgWeight) {
+						value = Math.trunc(((value / orgWeight) * newWeight))
+					}
+					else if (invOrgWeight == 0) {
+						value = newWeight
+					}
+					else {
+						value = Math.trunc((((value - orgWeight) / invOrgWeight) * invNewWeight + newWeight))
+					}
 
-		this.setCanvas()
-	}
-	setCanvas() {
-		this.currentCtx.putImageData(new ImageData(this.someImgData,this.d[2],this.d[3]),0,0)
-	}
-	isRatioLegal() {
-		const ratio = SKIN.size.width / SKIN.size.height
-		return this.image.width / this.image.height === ratio
-	}
-	getMultiplier() {
-		return this.image.width / SKIN.size.width
-	}
-	getColorArg(color, standard) {
-		if (Object.keys(COLOR_FORMAT).includes(standard) == false) {
-			throw Error(`Invalid color format: ${standard}\nValid formats: rgb, hsl, code`)
-		}
-		color = COLOR_FORMAT[standard](color)
-		return color
-	}
-	colorLimitForSkin(color, limit = 52.5) {	
-		if (color[2] < limit) {
-			color[2] = limit
-		}
-		return color
-	}
-	colorConvert(color, standard) {
-		color = this.getColorArg(color, standard)
+					buffer[byte] = value
+					buffer[byte + 1] = value
+					buffer[byte + 2] = value
+				}
 
-		if (standard == 'rgb') {
-			color = RGBToHSL(color[0],color[1],color[2])
-		}
-		// Preventing full black or full white skins
-		color = this.colorLimitForSkin(color)
+				this.api.functions.setCanvas(canvasContext, buffer)
+			},
+			createCanvas: (width = 0, height = 0) => {
+				const canvas = 'OffscreenCanvas' in window ? new OffscreenCanvas(0, 0) : document.createElement('canvas')
+				canvas.width = width
+				canvas.height = height
 
-		// Convert to RGB to apply the color
-		color = HSLToRGB(color[0],color[1],color[2])
+				return canvas
+			},
+			setCanvas: (canvasContext, buffer) => {
+				canvasContext.putImageData(new ImageData(buffer, canvasContext.canvas.width, canvasContext.canvas.height), 0, 0)
+			},
+			createAndAppendTeeElements: (parent, className, bodyPart, selector) => {
+				const element = document.createElement('div')
+				element.className = className
+			
+				if (bodyPart) {
+					element.setAttribute('data-teeassembler-body_part', '')
+				}
 
-		return new Color(...color)
-	}
-	setColor2(color, standard) {
-		color = this.colorConvert(color, standard)
-		this.setColor(color, 'grayscale')
-		if (this.isBody) {
-			this.reorderBody()
-		}
-		this.setColor(color, 'default')
-	}
-	async getTeeImage(player_color_body='none', player_color_feet='none', coloring_mode='code') {
-		await this.loadImage(this.imageLink)
-		player_color_body = player_color_body.toString()
-		player_color_feet = player_color_feet.toString()
-		let body_parts = Object.keys(SKIN.elements)
-		if (this.isRatioLegal()) {
-			for (let part in body_parts) {
-				let currentPart = body_parts[part]
-
-				this.elements[currentPart] = document.createElement('canvas')
-				let tempCanvas = this.elements[currentPart]
-
-				let multiplier = this.getMultiplier()
-				this.d = SKIN.elements[currentPart].map(x => x * multiplier)
-
-				tempCanvas.width = this.d[2]
-				tempCanvas.height = this.d[3]
-
-				this.currentCtx = tempCanvas.getContext('2d', {
-					willReadFrequently: true
-				})
-
-				this.currentCtx.putImageData(this.ctx.getImageData(this.d[0],this.d[1],this.d[2],this.d[3]),0,0)
-				if (body_parts[part] === 'body') {
-					this.isBody = true
+				if (selector) {
+					parent.querySelector(selector).appendChild(element)
 				}
 				else {
-					this.isBody = false
+					parent.appendChild(element)
 				}
-				this.currentImgData = this.currentCtx.getImageData(0,0,this.d[2],this.d[3])
-				
-				if (player_color_body !== 'none' && player_color_feet !== 'none') {
-					if (currentPart.includes('foot')) {
-						this.setColor2(player_color_feet, coloring_mode)
-					}
-					else if (!currentPart.includes('credits')) {
-						this.setColor2(player_color_body, coloring_mode)
-					}
+			},
+			getBlob: async (canvas) => {
+				let blob
+
+				if (canvas instanceof OffscreenCanvas) {
+					blob = await canvas.convertToBlob()
+				}
+				else {					
+					blob = await (() => {
+						return new Promise(r => {
+							canvas.toBlob(r)
+						})
+					})()
 				}
 
-				if (Object.keys(SKIN.elements)[body_parts.length-1] === currentPart) {
-					this.ctx.clearRect(0,0,this.ctx.width,this.ctx.height)
-					for (let i=0;i<Object.keys(SKIN.elements).length;i++) {
-						let e = SKIN.elements[Object.keys(this.elements)[i]].map(x => x * multiplier)
-						this.ctx.drawImage(this.elements[Object.keys(this.elements)[i]],e[0],e[1])
-						if (i === Object.keys(SKIN.elements).length-1) {
-							this.imageResult = this.canvas.toDataURL()
-							this.bodyColor = player_color_body
-							this.feetColor = player_color_feet
-							this.coloringMode = coloring_mode
-							return this.imageResult
+				return blob
+			},
+			isRatioLegal: () => {
+				return this.api.image.element.width / this.api.image.element.height === TeeAssembler.skin.size.width / TeeAssembler.skin.size.height
+			},
+			getMultiplier: () => {
+				return this.api.image.element.width / TeeAssembler.skin.size.width
+			},
+			getColorArg: (color, standard) => {
+				if (Object.keys(COLOR_FORMAT).includes(standard) == false) {
+					throw Error(`Invalid color format: ${standard}\nValid formats: rgb, hsl, code`)
+				}
+				color = COLOR_FORMAT[standard](color)
+
+				return color
+			},
+			colorLimitForSkin: (color, limit = 52.5) => {	
+				if (color[2] < limit) {
+					color[2] = limit
+				}
+
+				return color
+			},
+			colorConvert: (color, standard) => {
+				color = this.api.functions.getColorArg(color, standard)
+
+				if (standard == 'rgb') {
+					color = RGBToHSL(color[0], color[1], color[2])
+				}
+
+				// Preventing full black or full white skins
+				color = this.api.functions.colorLimitForSkin(color)
+
+				// Convert to RGB to apply the color
+				color = HSLToRGB(color[0], color[1], color[2])
+
+				return new Color(...color)
+			},
+			setColor2: async (canvasContext, color, standard, imageData, part) => {
+				if (!canvasContext) {
+					canvasContext = this.ctx
+				}
+				
+				color = this.api.functions.colorConvert(color, standard)
+
+				await this.api.functions.setColor(canvasContext, imageData, color, 'grayscale')
+
+				if (part === 'body') {
+					await this.api.functions.reorderBody(canvasContext, imageData)
+				}
+
+				await this.api.functions.setColor(canvasContext, imageData, color, 'default')
+			},
+			getTeeImage: async (player_color_body = 'none', player_color_feet = 'none', color_format = 'code') => {
+				// TODO: Optimize this code
+				await this.api.functions.loadImage(this.api.image.link)
+				
+				if (!this.api.functions.isRatioLegal()) {
+					throw new Error('Image has wrong ratio.')
+				}
+
+				const
+				multiplier = this.api.functions.getMultiplier(),
+				body_parts = Object.keys(TeeAssembler.skin.elements)
+				
+				this.colorFormat = color_format || 'code'
+
+				for (const part in body_parts) {
+					const bodyPartCanvases = {}
+
+					this.partMultiplied = TeeAssembler.skin.elements[body_parts[part]].map(x => x * multiplier)
+
+					bodyPartCanvases[part] = this.api.functions.createCanvas(this.partMultiplied[2], this.partMultiplied[3])
+					const currentCtx = bodyPartCanvases[part].getContext('2d')
+
+					currentCtx.putImageData(this.api.ctx.getImageData(this.partMultiplied[0], this.partMultiplied[1], this.partMultiplied[2], this.partMultiplied[3]), 0, 0)
+					this.api.image.data = currentCtx.getImageData(0, 0, this.partMultiplied[2], this.partMultiplied[3])
+
+					if (player_color_body !== 'none' && player_color_feet !== 'none') {
+						if (body_parts[part].includes('foot')) {
+							await this.api.functions.setColor2(currentCtx, player_color_feet, color_format, this.api.image.data, body_parts[part])
+						}
+						else if (!body_parts[part].includes('credits')) {
+							await this.api.functions.setColor2(currentCtx, player_color_body, color_format, this.api.image.data, body_parts[part])
 						}
 					}
+
+					this.api.ctx.clearRect(this.partMultiplied[0], this.partMultiplied[1], this.partMultiplied[2], this.partMultiplied[3])
+					this.api.ctx.drawImage(bodyPartCanvases[part], this.partMultiplied[0], this.partMultiplied[1])
 				}
+
+				if (this.api.canvas instanceof OffscreenCanvas) {
+					this.api.ctx.drawImage(this.api.canvas.transferToImageBitmap(), 0, 0)
+				}
+				else {
+					this.api.ctx.drawImage(await createImageBitmap(this.api.ctx.getImageData(0, 0, this.api.canvas.width, this.api.canvas.height)), 0, 0)
+				}
+
+				const blob = await this.api.functions.getBlob(this.api.canvas)
+				this.api.image.url = URL.createObjectURL(blob)
+
+				delete this.partMultiplied
+
+				return this.api.image.url
+			},
+			bindContainer: (container) => {
+				this.api.functions.setContainer(container)
+			},
+			unbindContainer: (deleteContainer = false) => {
+				this.api.functions.dontLookAtCursor()
+				
+				Object.keys(this.container.dataset).forEach(dataset => {
+					delete this.container.dataset[dataset]
+				})
+				
+				if (deleteContainer) {
+					URL.revokeObjectURL(this.api.image.url)
+					this.api.image.loaded = false
+					this.container.remove()
+				}
+				else {
+					this.container.replaceChildren()
+				}
+				
+				delete this.container
+			},
+			teeEyesTranslateFunction: () => {
+				this.api.markerCoord = {
+					x: this.api.marker.getBoundingClientRect().x,
+					y: this.api.marker.getBoundingClientRect().y
+				}
+
+				this.api.scale = (this.container.getBoundingClientRect().width / this.container.offsetWidth) * Number(window.getComputedStyle(TeeAssembler.array.tees[0].container).fontSize.replace('px',''))
+				this.api.teeEyes.style.transform = `translate(${(this.api.markerCoord.x - this.container.getBoundingClientRect().x) / this.api.scale}em, ${(this.api.markerCoord.y - this.container.getBoundingClientRect().y) / this.api.scale}em)`
+			},
+			setTeeEyesVariables: () => {
+				this.api.teeEyesVariables = true
+
+				this.api.line = document.querySelector(`.teeassembler-tee[data-teeassembler-id='${this.ID}'] .teeassembler-eyes_guide_line`)
+				this.api.marker = document.querySelector(`.teeassembler-tee[data-teeassembler-id='${this.ID}'] .teeassembler-eyes_guide_marker`)
+				this.api.teeEyes = document.querySelector(`.teeassembler-tee[data-teeassembler-id='${this.ID}'] .teeassembler-eyes`)
+			},
+			lookAtCursor: () => {
+				this.api.functions.setTeeEyesVariables()
+				this.api.functions.moveTeeEyesFunction = (e) => {
+					const originCoord = {
+						x: this.container.getBoundingClientRect().x + this.container.getBoundingClientRect().width/2,
+						y: this.container.getBoundingClientRect().y + this.container.getBoundingClientRect().height/2
+					}
+					this.eyesAngle = Math.atan2(e.clientY - originCoord.y, e.clientX - originCoord.x) * 180 / Math.PI
+
+					this.api.line.style.width = `${9.5 - (Math.sin(Math.PI / 180) * this.api.functions.roundToMultiple(this.eyesAngle) * 2)}em`
+					this.api.line.style.transform = `translate(-1em, .5em) rotate(${this.eyesAngle}deg)`
+					this.api.functions.teeEyesTranslateFunction()
+				}
+
+				document.addEventListener('mousemove', this.api.functions.moveTeeEyesFunction) 
+			},
+			dontLookAtCursor: () => {
+				document.removeEventListener('mousemove', this.api.functions.moveTeeEyesFunction)
+			},
+			lookAt: (degrees = 0) => {
+				this.eyesAngle = degrees
+
+				this.api.functions.setTeeEyesVariables()
+				this.api.line.style.width = `${9.5 - (Math.sin(Math.PI / 180) * this.api.functions.roundToMultiple(degrees) * 2)}em`
+				this.api.line.style.transform = `translate(-1em, .5em) rotate(${degrees}deg)`
+
+				// Default value to look right (0deg)
+				this.api.teeEyes.style.transform = `translate(56.5em, 48.5em)`
+
+				this.api.functions.teeEyesTranslateFunction()
+			},
+			roundToMultiple: (degrees = 0, multiple = 180) => {
+				const quantizedAngle = Math.round(degrees / multiple) * multiple
+
+				return Math.abs(degrees - quantizedAngle)
 			}
 		}
-		else {
-			throw Error('Image has wrong ratio.')
-		}
 	}
-	bindContainer(container) {
-		setContainer(this, container)
-	}
-	unbindContainer() {
-		this.container.removeAttribute('id')
-		this.container = undefined
-	}
-	teeEyesTranslateFunction() {
-		this.markerCoord = {
-			x: this.marker.getBoundingClientRect().x,
-			y: this.marker.getBoundingClientRect().y
-		}
-		this.scale = this.container.getBoundingClientRect().width / this.container.offsetWidth
-		this.teeEyes.style.transform = `translate(${(this.markerCoord.x - this.container.getBoundingClientRect().x) / this.scale}px, ${(this.markerCoord.y - this.container.getBoundingClientRect().y) / this.scale}px)`
-	}
-	setTeeEyesVariables() {
-		this.teeEyesVariables = true
 
-		this.line = document.querySelector(`#${this.randomID}.tee .line`)
-		this.marker = document.querySelector(`#${this.randomID}.tee .marker`)
-		this.teeEyes = document.querySelector(`#${this.randomID}.tee .eyes`)
-	}
-	lookAtCursor() {
-		this.setTeeEyesVariables()
-		let originCoord = {
-			x: this.line.getBoundingClientRect().x.toFixed(),
-			y: this.line.getBoundingClientRect().y.toFixed()
-		}
-
-		this.moveTeeEyesFunction = (e) => {
-			this.eyesAngle = Math.atan2(e.clientY - originCoord.y, e.clientX - originCoord.x) * 180 / Math.PI
-			this.line.style.transform = `translate(-1em, .5em) rotate(${this.eyesAngle}deg)`
-			this.teeEyesTranslateFunction()
-		}
-
-		this.eyeMoveEvent = document.addEventListener('mousemove', this.moveTeeEyesFunction) 
-	}
-	dontLookAtCursor() {
-		document.removeEventListener('mousemove', this.moveTeeEyesFunction)
-	}
-	lookAt(deg=0) {
-		this.eyesAngle = deg
-		this.setTeeEyesVariables()
-		this.line.style.transform = `translate(-1em, .5em) rotate(${deg}deg)`
-
-		this.teeEyesTranslateFunction()
-	}
+	TeeAssembler.Tee = Tee
 }
 
-document.querySelectorAll('.tee[data-skinimage]').forEach(el => {
-	new Tee(el.getAttribute('data-skinimage'), el)
+document.querySelectorAll('.teeassembler-tee[data-teeassembler-autoload]').forEach(el => {
+	options = {
+		container: el,
+		imageLink: el.getAttribute('data-teeassembler-skin_image'),
+		bodyColor: el.getAttribute('data-teeassembler-color_body'),
+		feetColor: el.getAttribute('data-teeassembler-color_feet'),
+		colorFormat: el.getAttribute('data-teeassembler-color_format')
+	}
+	new TeeAssembler.Tee(options)
 })
