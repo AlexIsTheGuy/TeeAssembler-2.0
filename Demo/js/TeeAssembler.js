@@ -410,7 +410,7 @@ const TeeAssembler = {
 					y: this.api.marker.getBoundingClientRect().y
 				}
 
-				this.api.scale = (this.container.getBoundingClientRect().width / this.container.offsetWidth) * Number(window.getComputedStyle(TeeAssembler.array.tees[0].container).fontSize.replace('px',''))
+				this.api.scale = (this.container.getBoundingClientRect().width / this.container.offsetWidth) * Number(window.getComputedStyle(this.container).fontSize.replace('px', ''))
 				this.api.teeEyes.style.transform = `translate(${(this.api.markerCoord.x - this.container.getBoundingClientRect().x) / this.api.scale}em, ${(this.api.markerCoord.y - this.container.getBoundingClientRect().y) / this.api.scale}em)`
 			},
 			setTeeEyesVariables: () => {
