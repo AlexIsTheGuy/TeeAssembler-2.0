@@ -1,31 +1,25 @@
 # TeeAssembler 2.0
 
-TeeAssembler 2.0 is a script used for coloring a TeeWorlds skin image the same way TeeWorlds does and rendering the image in your browser using only CSS and JavaScript.
+TeeAssembler 2.0 is a script used for coloring a Teeworlds skin image the same way Teeworlds does and rendering the image in your browser using HTML, CSS and JavaScript.
+
 
 ## Contact
 
-You can contact me on Discord for anything related to the project: Alexander_#6686
+You can contact me on Discord for anything related to the project: .alexander_
 
----
-## License
 
-Copyright (c) 2022 Aleksandar Blažić
-
-Licensed under the [MIT](https://github.com/AlexIsTheGuy/TeeAssembler-2.0/blob/main/LICENSE) license.
-
----
 ## Credits
 
-Thanks to [b0th#6474](https://github.com/theobori) for helping me with the project.
+Thanks to [b0th](https://github.com/theobori) for helping me with the project.
 
-Original project: [tw-utils](https://github.com/theobori/tw-utils).
+Original project: [teeworlds-utilities](https://github.com/teeworlds-utilities/teeworlds-utilities).
 
----
+
 ## Demo
 
-The Demo website can be viewed at [teeassembler.developer.li](https://teeassembler.developer.li).
+The demo website can be viewed [here](https://teeassembler.developer.li).
 
----
+
 ## Usage
 
 ```html
@@ -59,48 +53,56 @@ Add the styles in the `<head>` (optional) and the scripts after `<body>`.
 <div class='tee'></div>
 ```
 
-Note: No HTML is needed if we don't want to render the tee.
-
 ```js
-const myTeeContainer = document.querySelector('.tee')
-const myTee = new Tee('https://api.skins.tw/database/skins/whis.png', myTeeContainer)
+const myTeeOptions = {
+	container: document.querySelector('.teeassembler-tee'),
+	imageLink: 'https://ddnet.org/skins/skin/default.png',
+	bodyColor: 5288960,
+	feetColor: 255,
+	colorFormat: 'code'
+}
+
+const myTee = new TeeAssembler.Tee(myTeeOptions)
 ```
 
-Note: `myTeeContainer` can be omitted if we don't want to render the tee and can be added later.
+Notes:
+- `myTeeOptions.container` can be omitted if we don't want to render the Tee or if we want to assign a container later.
+- `bodyColor`, `feetColor` and `colorFormat` can be omitted if we don't want the Tee to have custom colors.
 
-##### Automatic Rendering (No coloring)
+#### Automatic Rendering
+
+Without custom colors
 
 ```html
-<div class='tee' data-skinimage='https://api.skins.tw/api/resolve/skins/mouse'></div>
+<div class='tee' data-teeassembler-autoload data-teeassembler-skin_image='https://ddnet.org/skins/skin/default.png'></div>
 ```
 
-##### Automatic Rendering (With coloring)
+With custom colors
 
 ```html
-<div class='tee' data-skinimage='https://api.skins.tw/api/resolve/skins/mouse' data-bodycolor='13149440' data-feetcolor='255' data-coloringmode='code'></div>
+<div class='tee' data-teeassembler-autoload data-teeassembler-skin_image='https://ddnet.org/skins/skin/default.png' data-teeassembler-color_body='13149440' data-teeassembler-color_feet='255' data-teeassembler-color_format='code'></div>
 ```
 
-Note: When using automatic rendering, the element will be given a random id attribute which can be used to reference the `Tee()` class using `teeArray.find(el => el.randomID === teeIDsArray[0])`
+Note: When using automatic rendering, the element will be given a random ID attribute which can be used to reference a Tee object using `TeeAssembler.array.tees.find(tee => tee.ID === myTee.ID)`
 
 ---
 ### Functions:
 
-#### Retreive (colored) Base64 image:
+#### Retreive image blob URL:
 
 ```js
-// getTeeImage(player_color_body, player_color_feet, coloring_mode)
-
-await myTee.getTeeImage() //  same image in Base64
-await myTee.getTeeImage('255','13149440','code')
-await myTee.getTeeImage('229, 99, 153','255, 255, 255','rgb')
-await myTee.getTeeImage('335, 71, 64','0, 0, 100','hsl')
+await myTee.api.functions.getTeeImage() // Original image
+await myTee.api.functions.getTeeImage('255', '13149440', 'code') // Colored using Teeworlds color code format
+await myTee.api.functions.getTeeImage('229, 99, 153', '255, 255, 255', 'rgb') // Colored using RGB format
+await myTee.api.functions.getTeeImage('335, 71, 64', '0, 0, 100', 'hsl') // Colored using HSL format
 ```
 
 ---
 #### Bind container:
 
 ```js
-const myTeeContainer = document.querySelector('.tee')
+const myTeeContainer = document.querySelector('.teeassembler-tee')
+
 myTee.bindContainer(myTeeContainer)
 ```
 
@@ -108,10 +110,11 @@ myTee.bindContainer(myTeeContainer)
 #### Unbind container:
 
 ```js
-myTee.unbindContainer()
+myTee.unbindContainer() // Remove the Tee from the container
+myTee.unbindContainer(true) // Remove the whole container and free up the image blob object URL.
 ```
 
-Note: If we want to move the tee from one container to another we have to unbind the container first and then bind to another.
+Note: If we want to move the Tee from one container to another we have to unbind the container first and then bind it to another.
 
 ---
 #### Get resolution multiplier:
@@ -135,7 +138,7 @@ myTee.dontLookAtCursor()
 ```
 
 ---
-#### Make the Tee look at an angle (degrees):
+#### Make the Tee look at a fixed angle (degrees):
 
 ```js
 myTee.lookAt(0) 	// Right
@@ -144,31 +147,30 @@ myTee.lookAt(180) 	// Left
 myTee.lookAt(270) 	// Up
 ```
 
-- If you want the tee to look right, the degrees can be omitted. `myTee.lookAt()`
-- The function supports degrees above 360. `myTee.lookAt(1254)`
+Note: If you want the Tee to look right, the degrees can be omitted. `myTee.lookAt()`
 
 ---
 ### Properties:
 
 ```js
-teeArray		// (Array) Array of loaded Tee classes
-teeIDsArray		// (Array) Array of random IDs from Tee classes
+TeeAssembler.array.tees		// (Array) Loaded Tee classes
+TeeAssembler.array.teeIDs	// (Array) Random IDs from Tee classes
 
-myTee.container		// (HTMLElement) Container for tee render
-myTee.randomID		// (String) random ID of Tee
+myTee.container				// (HTMLElement) Container of rendered Tee
+myTee.ID					// (String) Random ID of Tee
 
-myTee.canvas		// (HTMLElement) Canvas element for (colored) tee image
-myTee.ctx			// (CanvasRenderingContext2D) Canvas context
-myTee.elements		// (Object) Tee body parts and their canvas elements
+myTee.api.canvas			// (HTMLElement OR OffscreenCanvas) Canvas for modified Tee image
+myTee.api.ctx				// (CanvasRenderingContext2D OR OffscreenCanvasRenderingContext2D) Canvas context
+myTee.api.elements			// (Object) Tee body parts and their canvases
 
-myTee.image			// (HTMLElement) Image element of the original image
-myTee.imageLink		// (String) Original image URL
-myTee.imageResult	// (String) Base64 (colored) image 
+myTee.api.image.element		// (HTMLElement) Image element of the original image
+myTee.api.image.link		// (String) Original image URL
+myTee.api.image.url			// (String) Modified image blob URL 
 
-myTee.bodyColor		// (String) Color of tee body ('none' if not colored)
-myTee.feetColor		// (String) Color of tee feet ('none' if not colored)
-myTee.coloringMode	// (String) Coloring mode ('code', 'rgb', 'hsl')
-myTee.eyesAngle		// (String) Angle of eyes from center of the tee in degrees
+myTee.bodyColor				// (String) Color of Tee body (undefined if not colored)
+myTee.feetColor				// (String) Color of Tee feet (undefined if not colored)
+myTee.colorFormat			// (String) Coloring mode ('code', 'rgb', 'hsl')
+myTee.eyesAngle				// (String) Angle of eyes from center of the Tee in degrees
 ```
 
 ---
@@ -176,3 +178,10 @@ myTee.eyesAngle		// (String) Angle of eyes from center of the tee in degrees
 ## Known issues
 
 - Eyes are not perfectly aligned like in the game but it's close enough.
+
+
+## License
+
+Copyright (c) 2022–2024 Aleksandar Blažić and contributors
+
+Licensed under the [MIT](https://github.com/AlexIsTheGuy/TeeAssembler-2.0/blob/main/LICENSE) license.
