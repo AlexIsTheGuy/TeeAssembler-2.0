@@ -1,12 +1,14 @@
 /*
 
 	TeeAssembler 2.0
+	https://github.com/AlexIsTheGuy/TeeAssembler-2.0
 
 	Made by: Aleksandar Blazic
 	
 */
 
-let linkInput = document.querySelector('.externalSkin'),
+let
+linkInput = document.querySelector('.externalSkin'),
 loadButton = document.querySelector('.externalSkinButton'),
 template = document.querySelector('.template'),
 bodyColorInput = document.querySelector('.bodyInput'),
@@ -46,20 +48,20 @@ const hslToHex = (h,s,l) => {
 	}
 	const toHex = x => {
 		const hex = Math.round(x * 255).toString(16)
-		return hex.length === 1 ? "0" + hex : hex
+		return hex.length === 1 ? '0' + hex : hex
 	}
 	return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase()
 }
 
 let rgbB,hslB,rgbF,hslF
 
-loadButton.addEventListener('click', () => {
+loadButton?.addEventListener('click', () => {
 	document.querySelectorAll('.optionsWrap')[1].removeAttribute('disabled')
-	let teeContainer = document.querySelector('.tee')
+	let teeContainer = document.querySelector('.teeassembler-tee')
 	if (bodyColorInput.value !== '' || feetColorInput.value !== '') {
-		teeContainer.setAttribute('data-bodycolor', bodyColorInput.value)
-		teeContainer.setAttribute('data-feetcolor', feetColorInput.value)
-		teeContainer.setAttribute('data-coloringmode', coloringModeInput.value)
+		teeContainer.setAttribute('data-teeassembler-color_body', bodyColorInput.value)
+		teeContainer.setAttribute('data-teeassembler-color_feet', feetColorInput.value)
+		teeContainer.setAttribute('data-teeassembler-color_mode', coloringModeInput.value)
 	
 		rgbB,hslB,rgbF,hslF
 		if (coloringModeInput.value === 'code') {
@@ -98,15 +100,15 @@ loadButton.addEventListener('click', () => {
 		`
 	}
 	else {
-		teeContainer.removeAttribute('data-bodycolor')
-		teeContainer.removeAttribute('data-feetcolor')
-		teeContainer.removeAttribute('data-coloringmode')
+		teeContainer.removeAttribute('data-teeassembler-color_body')
+		teeContainer.removeAttribute('data-teeassembler-color_feet')
+		teeContainer.removeAttribute('data-teeassembler-color_mode')
 
 		document.querySelector('.bodyWrap .result').innerHTML = ''
 		document.querySelector('.feetWrap .result').innerHTML = ''
 	}
-	myTee = new Tee(linkInput.value)
-	myTee.bindContainer(teeContainer)
+	myTee = new TeeAssembler.Tee(linkInput.value)
+	myTee.api.functions.bindContainer(teeContainer)
 	currentAngle.value = `~${Math.round(myTee.eyesAngle)}deg`
 	if (lastInput !== linkInput.value) {
 		templateStyle.innerHTML = `
@@ -119,8 +121,8 @@ loadButton.addEventListener('click', () => {
 	lastInput = linkInput.value
 })
 
-angleInput.addEventListener('input', () => {
-	myTee.lookAt(angleInput.value)
+angleInput?.addEventListener('input', () => {
+	myTee.api.functions.lookAt(angleInput.value)
 	currentAngle.value = `~${Math.round(myTee.eyesAngle)}deg`
 })
 
@@ -135,13 +137,13 @@ let mouseMoveFunction = () => {
 	currentAngle.value = `~${Math.round(tempAngle)}deg`
 }
 
-lookAtCursorCheckbox.addEventListener('click', () => {
+lookAtCursorCheckbox?.addEventListener('click', () => {
 	if (lookAtCursorCheckbox.checked) {
-		myTee.lookAtCursor()
+		myTee.api.functions.lookAtCursor()
 		document.addEventListener('mousemove', mouseMoveFunction)
 	}
 	else {
-		myTee.dontLookAtCursor()
+		myTee.api.functions.dontLookAtCursor()
 		document.removeEventListener('mousemove', mouseMoveFunction)
 	}
 })
